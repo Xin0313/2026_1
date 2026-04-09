@@ -1,0 +1,82 @@
+# T-LESS dataset configuration
+# T-LESS has 30 objects, most of which are rotationally symmetric
+
+model:
+  backbone: convnext_tiny
+  fpn_out_channels: 256
+  n_coarse: 64
+  n_fine: 16
+  n_sym: 16                        # more symmetry classes for T-LESS
+  uncertainty_head: true
+  symmetry_head: true
+
+dataset:
+  name: tless
+  root: data/tless
+  # T-LESS 30 object IDs
+  object_ids: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+               11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+               21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
+  num_objects: 30
+  image_size: [540, 720]
+  input_size: [480, 640]
+  codebook_dir: data/tless/codebooks
+  # All T-LESS objects are approximately rotationally symmetric
+  symmetric_obj_ids: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10,
+                      11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+                      21, 22, 23, 24, 25, 26, 27, 28, 29, 30]
+
+augmentation:
+  color_jitter:
+    brightness: 0.4
+    contrast: 0.4
+    saturation: 0.3
+    hue: 0.1
+  random_erasing:
+    p: 0.5
+    scale: [0.02, 0.25]
+  copy_paste: true
+  background_replace:
+    p: 0.5
+    bg_dir: data/backgrounds
+  motion_blur:
+    p: 0.2
+    kernel_size: [3, 7]
+  gaussian_noise:
+    p: 0.2
+    std: [0.01, 0.05]
+
+training:
+  batch_size: 8
+  num_workers: 4
+  lr: 1.0e-4
+  weight_decay: 1.0e-4
+  optimizer: adamw
+  scheduler: cosine
+  warmup_epochs: 5
+  total_epochs: 200
+  phase1_epochs: 80
+  phase2_epochs: 120
+  grad_clip: 1.0
+  mixed_precision: true
+  save_freq: 10
+  log_freq: 50
+  output_dir: outputs/tless
+
+loss_weights:
+  seg: 2.0
+  code: 1.0
+  uv: 5.0
+  uncertainty: 1.0
+  pose: 10.0
+  consistency: 0.5
+
+pnp:
+  top_k: 512
+  n_iter: 5
+  reprojection_threshold: 3.0
+
+evaluation:
+  add_threshold: 0.1
+  adds_threshold: 0.1
+  auc_max_threshold: 0.1

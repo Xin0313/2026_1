@@ -1,0 +1,86 @@
+# Linemod-Occluded (LM-O) dataset configuration
+
+model:
+  backbone: convnext_tiny
+  fpn_out_channels: 256
+  n_coarse: 64
+  n_fine: 16
+  n_sym: 4
+  uncertainty_head: true
+  symmetry_head: true
+
+dataset:
+  name: lmo
+  root: data/lmo
+  # LM-O 8 object IDs
+  object_ids: [1, 5, 6, 8, 9, 10, 11, 12]
+  object_names:
+    - "ape"
+    - "cat"
+    - "driller"
+    - "duck"
+    - "eggbox"
+    - "glue"
+    - "holepuncher"
+    - "iron"
+  num_objects: 8
+  image_size: [480, 640]
+  input_size: [480, 640]
+  codebook_dir: data/lmo/codebooks
+  # Symmetric objects in LM-O
+  symmetric_obj_ids: [10, 11]  # glue, eggbox (approximate symmetry)
+
+augmentation:
+  color_jitter:
+    brightness: 0.5
+    contrast: 0.5
+    saturation: 0.4
+    hue: 0.1
+  random_erasing:
+    p: 0.6
+    scale: [0.02, 0.3]
+  copy_paste: true
+  background_replace:
+    p: 0.4
+    bg_dir: data/backgrounds
+  motion_blur:
+    p: 0.3
+    kernel_size: [3, 9]
+  gaussian_noise:
+    p: 0.3
+    std: [0.01, 0.05]
+
+training:
+  batch_size: 8
+  num_workers: 4
+  lr: 1.0e-4
+  weight_decay: 1.0e-4
+  optimizer: adamw
+  scheduler: cosine
+  warmup_epochs: 5
+  total_epochs: 200
+  phase1_epochs: 80
+  phase2_epochs: 120
+  grad_clip: 1.0
+  mixed_precision: true
+  save_freq: 10
+  log_freq: 50
+  output_dir: outputs/lmo
+
+loss_weights:
+  seg: 2.0
+  code: 1.0
+  uv: 5.0
+  uncertainty: 1.0
+  pose: 10.0
+  consistency: 0.5
+
+pnp:
+  top_k: 256
+  n_iter: 5
+  reprojection_threshold: 3.0
+
+evaluation:
+  add_threshold: 0.1
+  adds_threshold: 0.1
+  auc_max_threshold: 0.1
