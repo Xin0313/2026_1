@@ -1,0 +1,31 @@
+from setuptools import setup, find_packages
+
+setup(
+    name="schpose",
+    version="1.0.0",
+    description="SCHPose: Symmetry-aware Continuous-discrete Hybrid encoding for single-stage 6D Pose estimation",
+    author="SCHPose Team",
+    python_requires=">=3.8",
+    packages=find_packages(),
+    install_requires=[
+        "torch>=1.13.0",
+        "torchvision>=0.14.0",
+        "numpy>=1.21.0",
+        "opencv-python>=4.5.0",
+        "scipy>=1.7.0",
+        "scikit-learn>=1.0.0",
+        "trimesh>=3.9.0",
+        "PyYAML>=6.0",
+        "tensorboard>=2.8.0",
+        "tqdm>=4.62.0",
+        "Pillow>=8.3.0",
+        "matplotlib>=3.4.0",
+        "einops>=0.4.0",
+        "timm>=0.6.0",
+    ],
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: MIT License",
+        "Operating System :: OS Independent",
+    ],
+)

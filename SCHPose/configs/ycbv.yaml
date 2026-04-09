@@ -1,0 +1,100 @@
+# YCB-Video dataset configuration
+# Inherits from default.yaml with YCB-V specific overrides
+
+model:
+  backbone: convnext_tiny
+  fpn_out_channels: 256
+  n_coarse: 64
+  n_fine: 16
+  n_sym: 8
+  uncertainty_head: true
+  symmetry_head: true
+
+dataset:
+  name: ycbv
+  root: data/ycbv
+  # YCB-V 21 object IDs (1-indexed)
+  object_ids: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
+  object_names:
+    - "002_master_chef_can"
+    - "003_cracker_box"
+    - "004_sugar_box"
+    - "005_tomato_soup_can"
+    - "006_mustard_bottle"
+    - "007_tuna_fish_can"
+    - "008_pudding_box"
+    - "009_gelatin_box"
+    - "010_potted_meat_can"
+    - "011_banana"
+    - "019_pitcher_base"
+    - "021_bleach_cleanser"
+    - "024_bowl"
+    - "025_mug"
+    - "035_power_drill"
+    - "036_wood_block"
+    - "037_scissors"
+    - "040_large_marker"
+    - "051_large_clamp"
+    - "052_extra_large_clamp"
+    - "061_foam_brick"
+  num_objects: 21
+  image_size: [480, 640]
+  input_size: [480, 640]
+  codebook_dir: data/ycbv/codebooks
+  # Symmetric objects in YCB-V
+  symmetric_obj_ids: [13, 16, 19, 20, 21]  # bowl, wood_block, large_clamp, extra_large_clamp, foam_brick
+
+augmentation:
+  color_jitter:
+    brightness: 0.4
+    contrast: 0.4
+    saturation: 0.3
+    hue: 0.1
+  random_erasing:
+    p: 0.5
+    scale: [0.02, 0.2]
+  copy_paste: true
+  background_replace:
+    p: 0.3
+    bg_dir: data/backgrounds
+  motion_blur:
+    p: 0.2
+    kernel_size: [3, 7]
+  gaussian_noise:
+    p: 0.2
+    std: [0.01, 0.05]
+
+training:
+  batch_size: 8
+  num_workers: 4
+  lr: 1.0e-4
+  weight_decay: 1.0e-4
+  optimizer: adamw
+  scheduler: cosine
+  warmup_epochs: 5
+  total_epochs: 200
+  phase1_epochs: 80
+  phase2_epochs: 120
+  grad_clip: 1.0
+  mixed_precision: true
+  save_freq: 10
+  log_freq: 50
+  output_dir: outputs/ycbv
+
+loss_weights:
+  seg: 2.0
+  code: 1.0
+  uv: 5.0
+  uncertainty: 1.0
+  pose: 10.0
+  consistency: 0.5
+
+pnp:
+  top_k: 512
+  n_iter: 5
+  reprojection_threshold: 3.0
+
+evaluation:
+  add_threshold: 0.1
+  adds_threshold: 0.1
+  auc_max_threshold: 0.1
